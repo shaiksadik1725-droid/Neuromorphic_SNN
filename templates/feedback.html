@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}Feedback{% endblock %}
+{% block page_class %}feedback{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div>
+    <div class="eyebrow">SECTION IV  ·  THE LEDGER</div>
+    <h1 class="page-title">Every prediction, <em>annotated</em>.</h1>
+    <p class="page-sub">
+      A running ledger of recent inferences and the agreement notes you've
+      attached to them. Use it to spot weak spots, tune the model later, or
+      simply to keep score.
+    </p>
+  </div>
+  <div class="head-side">
+    <button class="btn btn-ghost btn-sm" id="clear-history">Clear history</button>
+    <button class="btn btn-ghost btn-sm" id="clear-feedback">Clear feedback</button>
+  </div>
+</header>
+
+<section class="metrics small">
+  <div class="metric"><div class="metric-num">{{ total }}</div><div class="metric-lbl">feedback entries</div></div>
+  <div class="metric"><div class="metric-num">{{ agree }}</div><div class="metric-lbl">agreed</div></div>
+  <div class="metric"><div class="metric-num">{{ disagree }}</div><div class="metric-lbl">disagreed</div></div>
+  <div class="metric">
+    <div class="metric-num">{{ '%.1f'|format(agree_pct) }}<small>%</small></div>
+    <div class="metric-lbl">agreement rate</div>
+  </div>
+  <div class="metric">
+    <div class="metric-num">{{ n_auto }}</div>
+    <div class="metric-lbl">auto-generated</div>
+  </div>
+  <div class="metric">
+    <div class="metric-num">{{ n_manual }}</div>
+    <div class="metric-lbl">manual</div>
+  </div>
+</section>
+
+<section class="grid-2 stretch">
+  <div class="card">
+    <div class="card-head">
+      <h3 class="card-title">Recent predictions</h3>
+      <span class="card-tag">last 20</span>
+    </div>
+    {% if history %}
+    <div class="table-wrap">
+      <table class="table compact">
+        <thead>
+          <tr>
+            <th>When</th><th>N</th><th>P</th><th>K</th>
+            <th>°C</th><th>%H</th><th>pH</th><th>mm</th>
+            <th>Predicted</th><th>Conf</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for r in history %}
+          <tr>
+            <td class="mono small">{{ r.timestamp }}</td>
+            <td>{{ r.N }}</td><td>{{ r.P }}</td><td>{{ r.K }}</td>
+            <td>{{ '%.1f'|format(r.temperature|float) }}</td>
+            <td>{{ '%.1f'|format(r.humidity|float) }}</td>
+            <td>{{ '%.2f'|format(r.ph|float) }}</td>
+            <td>{{ '%.1f'|format(r.rainfall|float) }}</td>
+            <td><span class="crop-chip slim">{{ r.predicted }}</span></td>
+            <td>{{ '%.1f'|format((r.get('confidence') or 0)|float) }}<small>%</small></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty">No predictions yet — try the Live Predict tab.</div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h3 class="card-title">Feedback ledger</h3>
+      <span class="card-tag">last 40</span>
+    </div>
+    {% if feedback %}
+    <div class="table-wrap">
+      <table class="table compact">
+        <thead>
+          <tr>
+            <th>When</th><th>Predicted</th><th>Agreed?</th>
+            <th>Conf</th><th>Source</th><th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for r in feedback %}
+          {% set is_auto = r.get('auto') in [True, 'True', 'true'] %}
+          <tr class="{% if r.agreed in [True,'True','true'] %}row-yes{% else %}row-no{% endif %}{% if is_auto %} row-auto{% endif %}">
+            <td class="mono small">{{ r.timestamp }}</td>
+            <td><span class="crop-chip slim">{{ r.predicted }}</span></td>
+            <td>
+              {% if r.agreed in [True,'True','true'] %}
+                <span class="dot-yes">●</span> agree
+              {% else %}
+                <span class="dot-no">●</span> disagree
+              {% endif %}
+            </td>
+            <td>{{ '%.1f'|format((r.get('confidence') or 0)|float) }}<small>%</small></td>
+            <td>
+              {% if is_auto %}
+                <span class="badge-auto" title="Generated automatically by confidence rules">auto</span>
+              {% else %}
+                <span class="badge-manual" title="Submitted by you">manual</span>
+              {% endif %}
+            </td>
+            <td class="small" style="max-width:260px;white-space:normal;line-height:1.35">
+              {{ r.get('comment') or '—' }}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty">No feedback recorded yet — give the model a thumbs-up or thumbs-down on the Live Predict tab.</div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<style>
+  .badge-auto {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: .04em;
+    background: rgba(111, 155, 179, 0.18);
+    color: #6f9bb3;
+    border: 1px solid rgba(111, 155, 179, 0.35);
+  }
+  .badge-manual {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: .04em;
+    background: rgba(233, 196, 106, 0.14);
+    color: #e9c46a;
+    border: 1px solid rgba(233, 196, 106, 0.30);
+  }
+  .row-auto td { opacity: 0.82; }
+</style>
+<script>
+  document.getElementById('clear-history')?.addEventListener('click', async () => {
+    if (!confirm('Clear all prediction history?')) return;
+    await fetch('/history/clear', {method:'POST'});
+    location.reload();
+  });
+  document.getElementById('clear-feedback')?.addEventListener('click', async () => {
+    if (!confirm('Clear all feedback notes?')) return;
+    await fetch('/feedback/clear', {method:'POST'});
+    location.reload();
+  });
+</script>
+{% endblock %}

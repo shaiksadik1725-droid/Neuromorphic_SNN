@@ -1,0 +1,3 @@
+timestamp,N,P,K,temperature,humidity,ph,rainfall,predicted,confidence
+2026-05-11T22:59:06,90,42,43,22,80,6.5,200,rice,76.11
+2026-05-11T22:59:08,36,42,43,22,80,6.5,200,coconut,42.48

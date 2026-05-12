@@ -1,0 +1,23 @@
+timestamp,N,P,K,temperature,humidity,ph,rainfall,predicted,confidence,agreed,user_label,comment,auto
+2026-05-11T22:57:42,18.0,9.0,40.0,19.45,89.02,5.63,106.16,pomegranate,91.98,True,,Auto: High-confidence prediction (92.0%),True
+2026-05-11T22:57:42,13.0,7.0,43.0,18.2,91.12,7.01,109.66,pomegranate,85.79,True,,Auto: High-confidence prediction (85.8%),True
+2026-05-11T22:57:42,34.0,9.0,36.0,22.81,86.34,6.28,110.44,pomegranate,59.83,False,,Auto: Low confidence (59.8%) — inputs may be borderline or inconsistent for pomegranate,True
+2026-05-11T22:57:42,9.0,25.0,41.0,24.82,91.91,5.97,109.29,pomegranate,63.14,True,,Auto: Moderate confidence (63.1%) — inputs are broadly consistent with pomegranate,True
+2026-05-11T22:57:42,37.0,11.0,36.0,24.25,85.56,6.71,106.92,pomegranate,65.81,True,,Auto: Moderate confidence (65.8%) — inputs are broadly consistent with pomegranate,True
+2026-05-11T22:57:42,19.0,17.0,39.0,24.72,85.56,6.73,111.28,pomegranate,47.68,False,,Auto: Low confidence (47.7%) — inputs may be borderline or inconsistent for pomegranate,True
+2026-05-11T22:57:42,22.0,23.0,44.0,20.13,89.32,6.14,107.34,pomegranate,74.62,True,,Auto: Moderate confidence (74.6%) — inputs are broadly consistent with pomegranate,True
+2026-05-11T22:57:42,10.0,5.0,42.0,20.24,91.09,6.89,109.25,pomegranate,82.36,True,,Auto: High-confidence prediction (82.4%),True
+2026-05-11T22:57:42,14.0,5.0,36.0,24.93,85.19,5.83,104.77,pomegranate,54.94,False,,Auto: Low confidence (54.9%) — inputs may be borderline or inconsistent for pomegranate,True
+2026-05-11T22:57:42,2.0,24.0,38.0,24.56,91.64,5.92,111.97,coconut,57.12,False,,Auto: Low confidence (57.1%) — inputs may be borderline or inconsistent for coconut,True
+2026-05-11T22:57:42,5.0,15.0,38.0,18.26,88.17,5.71,108.08,pomegranate,82.6,True,,Auto: High-confidence prediction (82.6%),True
+2026-05-11T22:57:42,17.0,18.0,43.0,24.49,90.84,5.84,103.2,coconut,49.8,False,,Auto: Low confidence (49.8%) — inputs may be borderline or inconsistent for coconut,True
+2026-05-11T22:57:42,8.0,23.0,38.0,19.3,87.18,7.01,105.48,pomegranate,60.66,True,,Auto: Moderate confidence (60.7%) — inputs are broadly consistent with pomegranate,True
+2026-05-11T22:57:42,25.0,17.0,40.0,18.91,87.75,6.61,111.28,pomegranate,67.86,True,,Auto: Moderate confidence (67.9%) — inputs are broadly consistent with pomegranate,True
+2026-05-11T22:57:42,9.0,16.0,36.0,23.78,92.93,5.89,106.98,pomegranate,56.94,False,,Auto: Low confidence (56.9%) — inputs may be borderline or inconsistent for pomegranate,True
+2026-05-11T22:57:42,0.0,27.0,38.0,22.45,89.9,6.74,109.39,pomegranate,64.78,True,,Auto: Moderate confidence (64.8%) — inputs are broadly consistent with pomegranate,True
+2026-05-11T22:57:42,22.0,9.0,44.0,24.72,88.88,5.74,112.19,coconut,57.09,False,,Auto: Low confidence (57.1%) — inputs may be borderline or inconsistent for coconut,True
+2026-05-11T22:57:42,14.0,8.0,43.0,21.93,94.46,7.05,111.72,pomegranate,69.43,True,,Auto: Moderate confidence (69.4%) — inputs are broadly consistent with pomegranate,True
+2026-05-11T22:57:42,36.0,7.0,37.0,19.87,86.36,5.78,108.32,pomegranate,61.47,True,,Auto: Moderate confidence (61.5%) — inputs are broadly consistent with pomegranate,True
+2026-05-11T22:57:42,34.0,21.0,42.0,18.76,89.93,6.65,111.02,pomegranate,61.49,True,,Auto: Moderate confidence (61.5%) — inputs are broadly consistent with pomegranate,True
+2026-05-11T22:59:06,90,42,43,22,80,6.5,200,rice,76.11,True,,Auto: Moderate confidence (76.1%) — inputs are broadly consistent with rice,True
+2026-05-11T22:59:08,36,42,43,22,80,6.5,200,coconut,42.48,False,,Auto: Low confidence (42.5%) — inputs may be borderline or inconsistent for coconut,True

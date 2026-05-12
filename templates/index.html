@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% block title %}Overview{% endblock %}
+{% block page_class %}home{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-grid">
+    <div class="hero-left">
+      <div class="eyebrow">VOL. I  ·  ED. 2026  ·  SECTION I</div>
+      <h1 class="hero-title">
+        Neuromorphic <em>crop</em> data,
+        <span class="quill">prediction</span>, by spikes.
+      </h1>
+      <p class="hero-lede">
+        Where soil meets spike, every field becomes a forecast — a living prediction drawn not from guesswork but from the quiet intelligence of seven numbers: nitrogen, phosphorus, potassium, temperature, humidity, pH, and rainfall. Seven numbers in, twenty-two futures out.</p>
+
+      <div class="hero-cta">
+        {% if ready %}
+          <a class="btn btn-primary" href="{{ url_for('predict_page') }}">
+            <span>Begin live prediction</span>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M13 6l6 6-6 6"/>
+            </svg>
+          </a>
+          <a class="btn btn-ghost" href="{{ url_for('upload_page') }}">Upload a CSV</a>
+        {% else %}
+          <div class="alert">
+            <strong>Model artifacts not found.</strong>
+            Place <code>crop_snn_best.pth</code>, <code>scaler.pkl</code>,
+            <code>label_encoder.pkl</code> and <code>model_config.pkl</code> in the
+            same folder as <code>app.py</code>, then refresh.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <aside class="hero-right">
+      <div class="plate">
+        <div class="plate-corner tl"></div><div class="plate-corner tr"></div>
+        <div class="plate-corner bl"></div><div class="plate-corner br"></div>
+        <div class="plate-label">Plate&nbsp;01</div>
+        <svg viewBox="0 0 220 280" class="botanical-illo" aria-hidden="true">
+          <g fill="none" stroke="currentColor" stroke-width="1">
+            <!-- stem -->
+            <path d="M110 260 C 108 200, 112 140, 110 80" stroke-width="1.4"/>
+            <!-- leaves -->
+            <path d="M110 220 C 80 210, 60 200, 45 180 C 70 175, 95 195, 110 215"/>
+            <path d="M110 220 C 140 210, 160 200, 175 180 C 150 175, 125 195, 110 215"/>
+            <path d="M110 180 C 85 170, 65 162, 55 145 C 80 142, 100 158, 110 175"/>
+            <path d="M110 180 C 135 170, 155 162, 165 145 C 140 142, 120 158, 110 175"/>
+            <path d="M110 140 C 92 130, 80 124, 75 108 C 95 108, 105 122, 110 138"/>
+            <path d="M110 140 C 128 130, 140 124, 145 108 C 125 108, 115 122, 110 138"/>
+            <!-- flower / seed-head -->
+            <circle cx="110" cy="70" r="22" stroke-width="1.4"/>
+            <circle cx="110" cy="70" r="14"/>
+            <circle cx="110" cy="70" r="6" fill="currentColor" opacity=".25"/>
+            <!-- petals -->
+            <g stroke-width="0.9">
+              <path d="M110 48 L 110 28"/>
+              <path d="M110 92 L 110 112"/>
+              <path d="M88 70 L 68 70"/>
+              <path d="M132 70 L 152 70"/>
+              <path d="M94 54 L 80 40"/>
+              <path d="M126 54 L 140 40"/>
+              <path d="M94 86 L 80 100"/>
+              <path d="M126 86 L 140 100"/>
+            </g>
+            <!-- root hint -->
+            <path d="M110 260 C 100 268, 90 270, 80 272" stroke-dasharray="2 3"/>
+            <path d="M110 260 C 120 268, 130 270, 140 272" stroke-dasharray="2 3"/>
+          </g>
+        </svg>
+        <div class="plate-caption">
+          <span class="ff-display italic">Spica spicata</span>
+          <span class="caption-sub">— after the manner of the spike train</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="metrics">
+  <div class="metric">
+    <div class="metric-num" data-target="{{ classes|length or 22 }}">0</div>
+    <div class="metric-lbl">crop classes</div>
+  </div>
+  <div class="metric">
+    <div class="metric-num" data-target="{{ features|length or 7 }}">0</div>
+    <div class="metric-lbl">input features</div>
+  </div>
+  <div class="metric">
+    <div class="metric-num" data-target="30">0</div>
+    <div class="metric-lbl">spike timesteps</div>
+  </div>
+  <div class="metric">
+    <div class="metric-num" data-target="{{ n_history }}">0</div>
+    <div class="metric-lbl">predictions logged</div>
+  </div>
+  <div class="metric">
+    <div class="metric-num" data-target="{{ n_feedback }}">0</div>
+    <div class="metric-lbl">feedback notes</div>
+  </div>
+</section>
+
+<section class="grid-2">
+  <div class="card">
+    <div class="card-head">
+      <h2 class="card-title">How a row becomes a recommendation</h2>
+      <span class="card-tag">Pipeline</span>
+    </div>
+    <ol class="pipeline">
+      <li>
+        <span class="pipeline-num">01</span>
+        <div>
+          <h4>Standardise</h4>
+          <p>Each feature is centred and scaled with the fitted <code>StandardScaler</code>
+          — the same one used during training.</p>
+        </div>
+      </li>
+      <li>
+        <span class="pipeline-num">02</span>
+        <div>
+          <h4>Rate-encode</h4>
+          <p>Values pass through a sigmoid, then become Bernoulli spikes
+          replicated across <strong>30</strong> timesteps.</p>
+        </div>
+      </li>
+      <li>
+        <span class="pipeline-num">03</span>
+        <div>
+          <h4>Integrate &amp; fire</h4>
+          <p>Four leaky layers (256 → 128 → 64 → 22) accumulate membrane
+          potential and emit spikes at every step.</p>
+        </div>
+      </li>
+      <li>
+        <span class="pipeline-num">04</span>
+        <div>
+          <h4>Vote &amp; average</h4>
+          <p>Spike counts are softmaxed; multiple stochastic runs are averaged
+          for a stable confidence estimate.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2 class="card-title">The crop roster</h2>
+      <span class="card-tag">{{ classes|length or 22 }} classes</span>
+    </div>
+    <div class="crops-list">
+      {% if classes %}
+        {% for c in classes %}
+          <span class="crop-chip" style="--i: {{ loop.index0 }}">{{ c }}</span>
+        {% endfor %}
+      {% else %}
+        {% for c in ['apple','banana','blackgram','chickpea','coconut','coffee','cotton','grapes','jute','kidneybeans','lentil','maize','mango','mothbeans','mungbean','muskmelon','orange','papaya','pigeonpeas','pomegranate','rice','watermelon'] %}
+          <span class="crop-chip" style="--i: {{ loop.index0 }}">{{ c }}</span>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% if stats %}
+<section class="card">
+  <div class="card-head">
+    <h2 class="card-title">Training distribution at a glance</h2>
+    <span class="card-tag">scaler stats</span>
+  </div>
+  <div class="stats-grid">
+    {% for f, v in stats.items() %}
+    <div class="stat-cell">
+      <div class="stat-feature">{{ f }}</div>
+      <div class="stat-row"><span>μ</span><b>{{ '%.2f'|format(v.mean) }}</b></div>
+      <div class="stat-row"><span>σ</span><b>{{ '%.2f'|format(v.std) }}</b></div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Animated count-up for metrics
+  document.querySelectorAll('.metric-num').forEach(el => {
+    const target = parseInt(el.dataset.target || '0', 10);
+    if (!target) { el.textContent = '0'; return; }
+    let cur = 0;
+    const dur = 900, t0 = performance.now();
+    function tick(now) {
+      const p = Math.min(1, (now - t0) / dur);
+      cur = Math.round(target * (1 - Math.pow(1 - p, 3)));
+      el.textContent = cur.toLocaleString();
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+</script>
+{% endblock %}

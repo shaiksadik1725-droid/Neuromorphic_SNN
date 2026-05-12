@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}Live Predict{% endblock %}
+{% block page_class %}predict{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div>
+    <div class="eyebrow">SECTION II  ·  LIVE INFERENCE</div>
+    <h1 class="page-title">A single row, <em>spike-counted</em> in real time.</h1>
+    <p class="page-sub">
+      Move the dials. As the values change, your soil-and-climate vector is
+      standardised, rate-encoded, and pushed through the spiking network — the
+      result updates in place, no page reloads, no remote service.
+    </p>
+  </div>
+  <div class="head-side">
+    <button id="randomize" class="btn btn-ghost" title="Sample a random profile">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="18" height="18" rx="3"/>
+        <circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/>
+        <circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/>
+        <circle cx="15.5" cy="8.5" r="1.2" fill="currentColor"/>
+        <circle cx="8.5" cy="15.5" r="1.2" fill="currentColor"/>
+      </svg>
+      Randomise
+    </button>
+  </div>
+</header>
+
+<section class="predict-grid">
+  <!-- LEFT column: input dials -->
+  <div class="card sliders-card">
+    <div class="card-head">
+      <h2 class="card-title">Inputs</h2>
+      <span class="card-tag">7 features</span>
+    </div>
+
+    <div class="dials">
+      {% for f, meta in [
+        ('N',           {'min': 0,   'max': 140, 'step': 1,   'unit': 'mg/kg', 'init': 90,    'label': 'Nitrogen'}),
+        ('P',           {'min': 0,   'max': 145, 'step': 1,   'unit': 'mg/kg', 'init': 42,    'label': 'Phosphorus'}),
+        ('K',           {'min': 0,   'max': 205, 'step': 1,   'unit': 'mg/kg', 'init': 43,    'label': 'Potassium'}),
+        ('temperature', {'min': 5,   'max': 45,  'step': 0.1, 'unit': '°C',    'init': 22.0,  'label': 'Temperature'}),
+        ('humidity',    {'min': 10,  'max': 100, 'step': 0.1, 'unit': '%',     'init': 80.0,  'label': 'Humidity'}),
+        ('ph',          {'min': 3,   'max': 10,  'step': 0.01,'unit': 'pH',    'init': 6.5,   'label': 'Soil pH'}),
+        ('rainfall',    {'min': 20,  'max': 300, 'step': 0.5, 'unit': 'mm',    'init': 200.0, 'label': 'Rainfall'}),
+      ] %}
+      <div class="dial" data-feat="{{ f }}">
+        <div class="dial-head">
+          <div class="dial-label">
+            <span class="ff-display">{{ meta.label }}</span>
+            <span class="dial-key">{{ f }}</span>
+          </div>
+          <div class="dial-val">
+            <input type="number" id="num-{{ f }}" value="{{ meta.init }}"
+                   min="{{ meta.min }}" max="{{ meta.max }}" step="{{ meta.step }}">
+            <span class="unit">{{ meta.unit }}</span>
+          </div>
+        </div>
+        <input type="range" id="rng-{{ f }}" class="dial-range"
+               min="{{ meta.min }}" max="{{ meta.max }}"
+               step="{{ meta.step }}" value="{{ meta.init }}">
+        <div class="dial-bounds">
+          <span>{{ meta.min }}</span><span>{{ meta.max }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="run-row">
+      <label class="checkbox">
+        <input type="checkbox" id="auto-run" checked>
+        <span>Live update as I move the dials</span>
+      </label>
+
+    </div>
+  </div>
+
+  <!-- RIGHT column: result + charts -->
+  <div class="result-stack">
+    <div class="card result-card" id="result-card">
+      <div class="result-head">
+        <div>
+          <div class="eyebrow">RECOMMENDATION</div>
+          <h2 class="result-crop ff-display" id="r-crop">—</h2>
+          <div class="result-meta">
+            <span class="pill" id="r-family">—</span>
+            <span class="pill" id="r-season">—</span>
+          </div>
+          <p class="result-note" id="r-note">
+            Move a dial to see the network's recommendation.
+          </p>
+        </div>
+        <div class="confidence-ring">
+          <svg viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" class="ring-bg"/>
+            <circle cx="60" cy="60" r="52" class="ring-fg" id="ring-fg"
+                    stroke-dasharray="0 1000"/>
+          </svg>
+          <div class="ring-num"><span id="r-conf">0</span><small>%</small></div>
+          <div class="ring-cap">confidence</div>
+        </div>
+      </div>
+
+      <div class="feedback-row" id="feedback-row" hidden>
+        <div class="fb-question">Was this recommendation useful?</div>
+        <div class="fb-actions">
+          <button class="fb-btn fb-yes" id="fb-yes">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 6 L9 17 l-5-5"/>
+            </svg>
+            Agree
+          </button>
+          <button class="fb-btn fb-no" id="fb-no">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6 L6 18 M6 6 l12 12"/>
+            </svg>
+            Disagree
+          </button>
+          <select id="fb-correct" class="fb-correct">
+            <option value="">— if disagreeing, suggest correct crop —</option>
+            {% for c in classes %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="fb-status" id="fb-status"></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card chart-card">
+        <div class="card-head">
+          <h3 class="card-title">Top-5 candidates</h3>
+          <span class="card-tag">softmax · averaged</span>
+        </div>
+        <div id="chart-top5" class="plotly-host"></div>
+      </div>
+      <div class="card chart-card">
+        <div class="card-head">
+          <h3 class="card-title">Profile fingerprint</h3>
+          <span class="card-tag">standardised</span>
+        </div>
+        <div id="chart-radar" class="plotly-host"></div>
+      </div>
+    </div>
+
+    <div class="card chart-card">
+      <div class="card-head">
+        <h3 class="card-title">Full class distribution</h3>
+        <span class="card-tag">all 22 crops</span>
+      </div>
+      <div id="chart-dist" class="plotly-host wide"></div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.FEATURES = {{ features|tojson }};
+  window.CLASSES  = {{ classes|tojson  }};
+  initLivePredict();
+</script>
+{% endblock %}
