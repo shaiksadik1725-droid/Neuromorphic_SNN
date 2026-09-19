@@ -1,31 +1,61 @@
 # Neuromorphic Crop Recommendation with Spiking Neural Networks
 
-A machine-learning research project that explores crop recommendation using a **Spiking Neural Network (SNN)** and compares it with conventional machine-learning models.
+<p align="center">
+  <strong>Neuromorphic AI for crop recommendation using SNNs and classical machine-learning baselines</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/PyTorch-EE4C2C?logo=pytorch&logoColor=white" />
+  <img src="https://img.shields.io/badge/snnTorch-Neuromorphic_AI-6A5ACD" />
+</p>
+
+## Project at a Glance
+
+| Item | Details |
+|---|---|
+| Domain | AI for agriculture |
+| Research focus | Spiking Neural Networks |
+| Inputs | N, P, K, temperature, humidity, pH, rainfall |
+| Baselines | Random Forest, SVM, MLP |
+| Interface | Python training pipeline + Flask application |
+| Status | Academic / research prototype |
 
 ## Overview
 
-The system uses agricultural features such as nitrogen, phosphorus, potassium, temperature, humidity, pH, and rainfall to recommend a crop. The project evaluates a neuromorphic learning approach alongside standard classifiers.
+The system recommends crops from agricultural and environmental measurements while comparing a **Spiking Neural Network (SNN)** against conventional machine-learning models. The project explores whether neuromorphic methods can be applied to a practical classification task.
 
-## Input Features
+## Results & Visual Evidence
 
-- Nitrogen (N)
-- Phosphorus (P)
-- Potassium (K)
-- Temperature
-- Humidity
-- pH
-- Rainfall
+<p align="center">
+  <img src="model_comparison.png" width="48%" alt="Model comparison" />
+  <img src="training_curves.png" width="48%" alt="SNN training curves" />
+</p>
 
-## Models
+<p align="center">
+  <img src="confusion_matrix.png" width="48%" alt="Confusion matrix" />
+  <img src="f1_precision_per_class.png" width="48%" alt="Per-class metrics" />
+</p>
 
-The training pipeline includes:
+## Model Pipeline
 
-- Spiking Neural Network using **snnTorch**
-- Random Forest
-- Support Vector Machine
-- Multi-Layer Perceptron
+```mermaid
+flowchart LR
+    A[Crop Dataset] --> B[Feature Scaling]
+    B --> C1[Random Forest]
+    B --> C2[SVM]
+    B --> C3[MLP]
+    B --> D[Rate Encoding]
+    D --> E[Spiking Neural Network]
+    C1 --> F[Evaluation]
+    C2 --> F
+    C3 --> F
+    E --> F
+```
 
-The SNN converts normalized feature values into spike trains and processes them through multiple leaky integrate-and-fire layers.
+## SNN Design
+
+The SNN uses rate-encoded spike trains and multiple leaky integrate-and-fire layers implemented with **snnTorch**. The training pipeline also saves model artifacts and evaluation plots for later inference and comparison.
 
 ## Technology Stack
 
@@ -36,15 +66,17 @@ The SNN converts normalized feature values into spike trains and processes them 
 - Pandas
 - NumPy
 - Matplotlib
+- Seaborn
 - Flask
 
-## Project Structure
+## Repository Structure
 
 ```text
 Neuromorphic_SNN/
 ├── train.py
 ├── app.py
 ├── model_utils.py
+├── requirements.txt
 ├── dataset/
 ├── crop_snn_best.pth
 ├── rf_model.pkl
@@ -57,35 +89,30 @@ Neuromorphic_SNN/
 └── f1_precision_per_class.png
 ```
 
-## Training
+## Setup
 
 ```bash
+git clone https://github.com/shaiksadik1725-droid/Neuromorphic_SNN.git
+cd Neuromorphic_SNN
+pip install -r requirements.txt
 python train.py
 ```
 
-The training script:
+## Research Value
 
-1. Loads and preprocesses the crop dataset.
-2. Standardizes numerical features.
-3. Trains conventional baseline models.
-4. Rate-encodes features as spike trains.
-5. Trains the SNN.
-6. Evaluates performance and saves model artifacts and plots.
+The repository does more than train one classifier: it places a neuromorphic model beside conventional baselines and preserves evaluation artifacts for comparison.
 
-## Why Neuromorphic Computing?
+## Future Work
 
-Spiking neural networks process information through discrete spike events inspired by biological neurons. This project investigates how that approach can be applied to a practical agricultural classification problem.
-
-## Future Improvements
-
-- Benchmark energy efficiency on neuromorphic hardware
-- Add more agricultural and soil variables
-- Perform broader cross-validation and hyperparameter studies
-- Deploy the inference pipeline to edge hardware
-- Expand model interpretability and error analysis
+- Benchmark latency and energy use on neuromorphic hardware
+- Expand cross-validation and hyperparameter studies
+- Add more soil and weather variables
+- Add model explainability
+- Deploy inference to edge hardware
+- Add automated reproducibility checks
 
 ## Author
 
 **Sadik Shaik**
 
-Computer Engineering / AI & Embedded Systems Projects
+Computer Engineering · Artificial Intelligence · Embedded Systems
