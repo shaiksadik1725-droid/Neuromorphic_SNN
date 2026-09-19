@@ -8,6 +8,7 @@
   <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white" />
   <img src="https://img.shields.io/badge/PyTorch-EE4C2C?logo=pytorch&logoColor=white" />
   <img src="https://img.shields.io/badge/snnTorch-Neuromorphic_AI-6A5ACD" />
+  <a href="https://github.com/shaiksadik1725-droid/Neuromorphic_SNN/actions/workflows/python-syntax.yml"><img src="https://github.com/shaiksadik1725-droid/Neuromorphic_SNN/actions/workflows/python-syntax.yml/badge.svg" alt="Python syntax check" /></a>
 </p>
 
 ## Project at a Glance
